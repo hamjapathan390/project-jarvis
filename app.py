@@ -18,7 +18,7 @@ if "student_tasks" not in st.session_state:
 
 if "messages" not in st.session_state:
     st.session_state.messages = [
-        {"role": "assistant", "content": "Hello Boss! JARVIS systems online at 100% capacity. Omega-level threat monitoring and priority matrix are active."}
+        {"role": "assistant", "content": "Hello Boss! JARVIS systems online. I am your universal personal assistant. Ask me anything about the world, or check your omega-level threat matrix!"}
     ]
 
 # Combine all records for global notification checks
@@ -34,11 +34,11 @@ if len(all_active_records) > 0:
         </div>
         """, unsafe_allow_html=True)
 
-# Sidebar for System Diagnostics & Autonomous Notification Hub
+# Sidebar for System Diagnostics & Universal Personal Assistant Chat
 with st.sidebar:
     st.image("https://img.icons8.com/fluency/96/iron-man.png", width=80)
     st.markdown("### JARVIS Command Hub")
-    st.info("Status: Online & Autonomous [Mark VII Ready]")
+    st.info("Status: Online & Universal [Mark VII Ready]")
     st.markdown(f"**Vault Records:** {len(st.session_state.vault)}")
     st.markdown(f"**Student Tasks:** {len(st.session_state.student_tasks)}")
     st.markdown("---")
@@ -57,16 +57,25 @@ with st.sidebar:
         st.success("All systems clear. No pending threat alerts.")
 
     st.markdown("---")
-    st.markdown("### 💬 JARVIS AI Intelligence")
+    st.markdown("### 💬 JARVIS Universal Assistant")
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
                 
-    if user_query := st.chat_input("Ask JARVIS anything..."):
+    if user_query := st.chat_input("Ask JARVIS anything about the world..."):
         st.session_state.messages.append({"role": "user", "content": user_query})
         q_lower = user_query.lower()
         
-        if "urgent" in q_lower or "deadline" in q_lower or "omega" in q_lower:
+        # Universal Assistant Brain & Stark Aura Response Engine
+        if "hello" in q_lower or "hi" in q_lower or "hey" in q_lower:
+            bot_reply = "Hello Boss! Systems are running at peak efficiency. What world knowledge or security protocol do you require today?"
+        elif "who are you" in q_lower or "your name" in q_lower:
+            bot_reply = "I am JARVIS, your personal global intelligence and security assistant built by Tony Stark."
+        elif "science" in q_lower or "tech" in q_lower or "quantum" in q_lower:
+            bot_reply = f"Fascinating topic, Boss. Analyzing query '{user_query}': Advanced technological paradigms suggest infinite possibilities when paired with Stark-grade architecture."
+        elif "weather" in q_lower or "time" in q_lower:
+            bot_reply = f"Atmospheric telemetry and temporal matrices indicate all systems stable across coordinates. Query processed: '{user_query}'."
+        elif "urgent" in q_lower or "deadline" in q_lower or "omega" in q_lower:
             if len(all_active_records) > 0:
                 top_item = max(all_active_records, key=lambda x: x.get('urgency_score', 0))
                 name_key = top_item.get('name', top_item.get('title'))
@@ -74,7 +83,7 @@ with st.sidebar:
             else:
                 bot_reply = "Boss, no active notifications or deadlines registered in the system."
         else:
-            bot_reply = f"I processed your query: '{user_query}'. All security parameters are stable."
+            bot_reply = f"Query logged: '{user_query}'. As your universal personal assistant, I'm scanning global databases and local vaults simultaneously. Everything is fully optimized, Boss!"
             
         st.session_state.messages.append({"role": "assistant", "content": bot_reply})
         st.rerun()
@@ -117,12 +126,10 @@ with tab1:
             except Exception:
                 file_content = "Encrypted payload."
 
-            # Format 12-hour time correctly
             base_time_str = dl_time.strftime("%I:%M")
             time_formatted = f"{base_time_str} {ampm_choice}"
             deadline_str = f"{dl_date} at {time_formatted}"
             
-            # Convert to 24-hour for accurate urgency calculation
             hour_val = dl_time.hour
             if ampm_choice == "PM" and hour_val < 12:
                 hour_val += 12
