@@ -45,7 +45,6 @@ with st.sidebar:
     
     st.markdown("### 🔔 Autonomous Notification Stream")
     if len(all_active_records) > 0:
-        # Sort and show top 3 notifications
         notif_sorted = sorted(all_active_records, key=lambda x: x['urgency_score'], reverse=True)[:3]
         for n_item in notif_sorted:
             n_name = n_item.get('name', n_item.get('title'))
@@ -97,7 +96,7 @@ with tab1:
         with col_f1:
             dl_date = st.date_input("Deadline Date")
         with col_f2:
-            dl_time = st.time_input("Deadline Time")
+            dl_time = st.time_input("Deadline Time (12-Hour)", value=datetime.strptime("12:00 PM", "%I:%M %p").time())
         with col_f3:
             ampm_choice = st.selectbox("AM / PM", ["AM", "PM"])
             
@@ -114,11 +113,20 @@ with tab1:
             except Exception:
                 file_content = "Encrypted payload."
 
+            # Format 12-hour time correctly
             base_time_str = dl_time.strftime("%I:%M")
             time_formatted = f"{base_time_str} {ampm_choice}"
             deadline_str = f"{dl_date} at {time_formatted}"
             
-            deadline_dt = datetime.combine(dl_date, dl_time)
+            # Convert to 24-hour for accurate urgency calculation
+            hour_val = dl_time.hour
+            if ampm_choice == "PM" and hour_val < 12:
+                hour_val += 12
+            elif ampm_choice == "AM" and hour_val == 12:
+                hour_val = 0
+            
+            adjusted_time = dl_time.replace(hour=hour_val)
+            deadline_dt = datetime.combine(dl_date, adjusted_time)
             current_dt = datetime.now()
             total_sec = (deadline_dt - current_dt).total_seconds()
             
@@ -186,7 +194,7 @@ with tab2:
         with tc1:
             t_date = st.date_input("Deadline Date", key="st_date")
         with tc2:
-            t_time = st.time_input("Deadline Time", key="st_time")
+            t_time = st.time_input("Deadline Time (12-Hour)", value=datetime.strptime("12:00 PM", "%I:%M %p").time(), key="st_time")
         with tc3:
             t_ampm = st.selectbox("AM / PM", ["AM", "PM"], key="st_ampm")
             
@@ -197,7 +205,14 @@ with tab2:
             t_time_fmt = f"{t_base_fmt} {t_ampm}"
             t_deadline_str = f"{t_date} at {t_time_fmt}"
             
-            t_dt = datetime.combine(t_date, t_time)
+            t_hour_val = t_time.hour
+            if t_ampm == "PM" and t_hour_val < 12:
+                t_hour_val += 12
+            elif t_ampm == "AM" and t_hour_val == 12:
+                t_hour_val = 0
+            
+            t_adjusted_time = t_time.replace(hour=t_hour_val)
+            t_dt = datetime.combine(t_date, t_adjusted_time)
             cur_dt = datetime.now()
             sec_diff = (t_dt - cur_dt).total_seconds()
             
