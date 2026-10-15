@@ -18,10 +18,10 @@ if "student_tasks" not in st.session_state:
 
 if "messages" not in st.session_state:
     st.session_state.messages = [
-        {"role": "assistant", "content": "Hello Sir! JARVIS systems online at 100% capacity. Ready for tactical document ingestion and live optical scans."}
+        {"role": "assistant", "content": "Hello Sir! JARVIS systems online at 100% capacity. Voice command simulation and priority matrix are fully operational."}
     ]
 
-# Sidebar for System Diagnostics & High-Power AI Chatbot
+# Sidebar for System Diagnostics & Voice Command Hub
 with st.sidebar:
     st.image("https://img.icons8.com/fluency/96/iron-man.png", width=80)
     st.markdown("### JARVIS Command Hub")
@@ -30,29 +30,50 @@ with st.sidebar:
     st.markdown(f"**Student Tasks:** {len(st.session_state.student_tasks)}")
     st.markdown("---")
     
-    st.markdown("### 💬 JARVIS AI Intelligence")
+    st.markdown("### 🎙️ Stark Neural Voice Simulator")
+    st.markdown("Simulate voice commands for live hackathon demonstration:")
     
+    voice_cmd = st.selectbox(
+        "Select Voice Protocol:",
+        [
+            "-- Select Command --",
+            "🗣️ 'JARVIS, run full system diagnostics'",
+            "🗣️ 'JARVIS, what is my most urgent deadline?'",
+            "🗣️ 'JARVIS, execute security lockdown scan'",
+            "🗣️ 'JARVIS, give me a morning briefing'"
+        ]
+    )
+    
+    if st.button("🔊 Execute Voice Command"):
+        if voice_cmd != "-- Select Command --":
+            all_records = st.session_state.vault + st.session_state.student_tasks
+            if "diagnostics" in voice_cmd:
+                resp = f"Diagnostics Report: Core temp optimal. Vault records: {len(st.session_state.vault)}. Student tasks: {len(st.session_state.student_tasks)}. All security protocols green."
+            elif "urgent" in voice_cmd:
+                if len(all_records) > 0:
+                    top_item = max(all_records, key=lambda x: x.get('urgency_score', 0))
+                    name_key = top_item.get('name', top_item.get('title'))
+                    resp = f"Sir, most urgent item is **{name_key}** due on **{top_item['deadline']}**."
+                else:
+                    resp = "Sir, no active records or deadlines found in the database."
+            elif "lockdown" in voice_cmd:
+                resp = "Security lockdown initiated. Digilocker-class encryption active. Zero vulnerabilities detected."
+            else:
+                resp = "All systems are running at peak efficiency, Boss. Ready for KRYPTA 2026 presentation."
+            
+            st.session_state.messages.append({"role": "user", "content": voice_cmd})
+            st.session_state.messages.append({"role": "assistant", "content": resp})
+            st.rerun()
+
+    st.markdown("---")
+    st.markdown("### 💬 JARVIS AI Intelligence")
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
                 
     if user_query := st.chat_input("Ask JARVIS anything..."):
         st.session_state.messages.append({"role": "user", "content": user_query})
-        q_lower = user_query.lower()
-        all_records = st.session_state.vault + st.session_state.student_tasks
-        
-        if "urgent" in q_lower or "deadline" in q_lower or "priority" in q_lower:
-            if len(all_records) > 0:
-                top_item = max(all_records, key=lambda x: x.get('urgency_score', 0))
-                name_key = top_item.get('name', top_item.get('title'))
-                bot_reply = f"Sir, analyzing all records, your most urgent item is **{name_key}** with a deadline set for **{top_item['deadline']}** (Urgency: {top_item['urgency_score']}%)."
-            else:
-                bot_reply = "Sir, your vault and student task lists are currently empty."
-        elif "summary" in q_lower or "status" in q_lower:
-            bot_reply = f"System Diagnostics Report:\nEnterprise Vault Documents: {len(st.session_state.vault)}\nStudent Hub Tasks: {len(st.session_state.student_tasks)}\nAll optical sensors and security protocols are fully operational."
-        else:
-            bot_reply = f"I processed your query: '{user_query}'. Everything in your secure vault is being monitored in real time."
-            
+        bot_reply = f"I processed your query: '{user_query}'. All security parameters are stable."
         st.session_state.messages.append({"role": "assistant", "content": bot_reply})
         st.rerun()
 
@@ -66,23 +87,12 @@ with st.sidebar:
 tab1, tab2 = st.tabs(["📁 Enterprise / General Vault", "🎓 Student Homework & Exam Hub"])
 
 with tab1:
-    st.subheader("📥 Secure Document, Image & Live Camera Ingestion Portal")
-    st.markdown("Choose whether you want to upload a standard file **OR** activate the **Stark Optical Camera** to snap a live photo directly.")
+    st.subheader("📥 Secure Document & File Ingestion Portal")
+    st.markdown("Upload PDFs, text files, or document snapshots for instant priority sorting.")
     
     with st.form("vault_form", clear_on_submit=True):
-        # Radio button to switch modes inside the form cleanly
-        input_mode = st.radio("Select Ingestion Mode:", ["📂 Upload File (PDF/TXT/Image)", "📸 Live Camera Snapshot"], key="mode_selector")
+        uploaded_file = st.file_uploader("Upload PDF, Text Document, or Image", type=["pdf", "txt", "png", "jpg", "jpeg"])
         
-        uploaded_file = None
-        camera_image = None
-        
-        if input_mode == "📂 Upload File (PDF/TXT/Image)":
-            uploaded_file = st.file_uploader("Upload PDF, Text Document, or Image", type=["pdf", "txt", "png", "jpg", "jpeg"])
-        else:
-            st.markdown("#### 🔴 JARVIS Optical Sensor Feed")
-            camera_image = st.camera_input("Click 'Take Photo' to capture live document snapshot")
-        
-        st.markdown("---")
         st.markdown("#### ⏰ Set Deadline Date & Time")
         col_f1, col_f2, col_f3 = st.columns([2, 1, 1])
         with col_f1:
@@ -94,73 +104,55 @@ with tab1:
             
         submit_vault = st.form_submit_button("🚀 Ingest & Prioritize Asset")
         
-        if submit_vault:
-            # Check which input was provided
-            active_asset = uploaded_file if uploaded_file is not None else camera_image
-            
-            if active_asset is not None:
-                try:
-                    if uploaded_file is not None:
-                        file_name = uploaded_file.name
-                        file_type = uploaded_file.type
-                        if "text" in uploaded_file.type or uploaded_file.name.endswith('.txt'):
-                            file_content = uploaded_file.getvalue().decode("utf-8", errors="ignore")
-                        else:
-                            file_content = uploaded_file
-                    else:
-                        timestamp_tag = datetime.now().strftime("%Y%m%d_%H%M%S")
-                        file_name = f"Stark_Snapshot_{timestamp_tag}.jpg"
-                        file_type = "image/jpeg"
-                        file_content = camera_image
-                except Exception:
-                    file_content = "Encrypted payload."
-                    file_name = "Secure_Asset.dat"
-                    file_type = "application/octet-stream"
-
-                # Format time
-                base_time_str = dl_time.strftime("%I:%M")
-                time_formatted = f"{base_time_str} {ampm_choice}"
-                deadline_str = f"{dl_date} at {time_formatted}"
-                
-                # Urgency score calculation
-                deadline_dt = datetime.combine(dl_date, dl_time)
-                current_dt = datetime.now()
-                total_sec = (deadline_dt - current_dt).total_seconds()
-                
-                if total_sec <= 0:
-                    urgency_score = 100.0
-                    urgency_label = "🚨 EXPIRED"
+        if submit_vault and uploaded_file is not None:
+            try:
+                if uploaded_file.type in ["image/png", "image/jpg", "image/jpeg"]:
+                    file_content = uploaded_file
+                elif uploaded_file.type == "text/plain" or uploaded_file.name.endswith('.txt'):
+                    file_content = uploaded_file.getvalue().decode("utf-8", errors="ignore")
                 else:
-                    max_window = 604800.0  # 7 days scale
-                    urgency_score = round(max(0.0, min(100.0, (1.0 - (total_sec / max_window)) * 100.0)), 1)
-                    if total_sec < 86400:
-                        urgency_label = "🔥 High Priority"
-                    elif total_sec < 259200:
-                        urgency_label = "⚠️ Moderate Priority"
-                    else:
-                        urgency_label = "✅ Safe Priority"
+                    file_content = f"Binary payload for {uploaded_file.name}"
+            except Exception:
+                file_content = "Encrypted payload."
 
-                doc_record = {
-                    "name": file_name,
-                    "type": file_type,
-                    "content": file_content,
-                    "deadline": deadline_str,
-                    "urgency_score": urgency_score,
-                    "urgency_label": urgency_label,
-                    "upload_time": current_dt.strftime("%Y-%m-%d %I:%M %p")
-                }
-                
-                st.session_state.vault.append(doc_record)
-                st.success(f"Successfully ingested '{file_name}' into Enterprise Vault!")
+            base_time_str = dl_time.strftime("%I:%M")
+            time_formatted = f"{base_time_str} {ampm_choice}"
+            deadline_str = f"{dl_date} at {time_formatted}"
+            
+            deadline_dt = datetime.combine(dl_date, dl_time)
+            current_dt = datetime.now()
+            total_sec = (deadline_dt - current_dt).total_seconds()
+            
+            if total_sec <= 0:
+                urgency_score = 100.0
+                urgency_label = "🚨 EXPIRED"
             else:
-                st.warning("Sir, please either upload a document or capture a live camera snapshot before submitting.")
+                max_window = 604800.0
+                urgency_score = round(max(0.0, min(100.0, (1.0 - (total_sec / max_window)) * 100.0)), 1)
+                if total_sec < 86400:
+                    urgency_label = "🔥 High Priority"
+                elif total_sec < 259200:
+                    urgency_label = "⚠️ Moderate Priority"
+                else:
+                    urgency_label = "✅ Safe Priority"
+
+            doc_record = {
+                "name": uploaded_file.name,
+                "type": uploaded_file.type,
+                "content": file_content,
+                "deadline": deadline_str,
+                "urgency_score": urgency_score,
+                "urgency_label": urgency_label,
+                "upload_time": current_dt.strftime("%Y-%m-%d %I:%M %p")
+            }
+            st.session_state.vault.append(doc_record)
+            st.success(f"Successfully ingested '{uploaded_file.name}' into Enterprise Vault!")
 
     st.markdown("---")
     st.subheader("📋 Prioritized Vault Archive (Sorted by Urgency)")
 
     if len(st.session_state.vault) > 0:
         sorted_vault = sorted(st.session_state.vault, key=lambda x: x['urgency_score'], reverse=True)
-        
         for idx, doc in enumerate(sorted_vault):
             st.markdown(f"""
             <div style="background-color: #1e1e2f; padding: 18px; border-radius: 12px; border-left: 6px solid #00ffcc; margin-bottom: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
@@ -172,17 +164,16 @@ with tab1:
             </div>
             """, unsafe_allow_html=True)
             
-            with st.expander(f"🔍 View Asset / Snapshot & Controls for {doc['name']}" ):
+            with st.expander(f"🔍 View File & Controls for {doc['name']}"):
                 if "image" in doc['type']:
                     st.image(doc['content'], caption=doc['name'], use_column_width=True)
                 else:
                     st.text_area("File Content Preview", str(doc['content']), height=120, key=f"preview_v_{idx}")
-                    
                 if st.button(f"🗑️ Delete Record", key=f"del_vault_{idx}"):
                     st.session_state.vault.remove(doc)
                     st.rerun()
     else:
-        st.info("Vault is empty. Upload documents or capture live camera snapshots above to begin sorting.")
+        st.info("Vault is empty. Upload documents above to begin sorting.")
 
 with tab2:
     st.subheader("🎓 Student Homework, Project & Exam Hub")
@@ -209,8 +200,8 @@ with tab2:
             
             t_dt = datetime.combine(t_date, t_time)
             cur_dt = datetime.now()
-            
             sec_diff = (t_dt - cur_dt).total_seconds()
+            
             if sec_diff <= 0:
                 t_score = 100.0
                 t_label = "🚨 EXPIRED"
@@ -234,7 +225,6 @@ with tab2:
 
     if len(st.session_state.student_tasks) > 0:
         sorted_tasks = sorted(st.session_state.student_tasks, key=lambda x: x['urgency_score'], reverse=True)
-        
         for s_idx, task in enumerate(sorted_tasks):
             st.markdown(f"""
             <div style="background-color: #1e1e2f; padding: 18px; border-radius: 12px; border-left: 6px solid #ffcc00; margin-bottom: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
