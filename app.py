@@ -4,9 +4,9 @@ from datetime import datetime
 # Page Configuration
 st.set_page_config(page_title="Project JARVIS: AI Vault & Sentinel", page_icon="🛡️", layout="wide")
 
-# Stark-Grade Header
+# Stark-Grade Header & Cinematic Aura
 st.title("🛡️ Project JARVIS: Autonomous Vault & Advanced AI Assistant")
-st.markdown("### *Digilocker-Class Security, Priority Sorting & Next-Gen Conversational Sentinel.*")
+st.markdown("### *Digilocker-Class Security, Autonomous Reminders & Next-Gen Conversational Sentinel.*")
 st.markdown("---")
 
 # Initialize Session State
@@ -18,10 +18,23 @@ if "student_tasks" not in st.session_state:
 
 if "messages" not in st.session_state:
     st.session_state.messages = [
-        {"role": "assistant", "content": "Hello Sir! JARVIS systems online at 100% capacity. Voice command simulation and priority matrix are fully operational."}
+        {"role": "assistant", "content": "Hello Boss! JARVIS systems online at 100% capacity. Autonomous notification matrix and priority monitoring are active."}
     ]
 
-# Sidebar for System Diagnostics & Voice Command Hub
+# Combine all records for global notification checks
+all_active_records = st.session_state.vault + st.session_state.student_tasks
+
+# --- TONY STARK AURA: LIVE URGENT NOTIFICATION BANNER ---
+if len(all_active_records) > 0:
+    urgent_items = [item for item in all_active_records if item.get('urgency_score', 0) >= 70.0]
+    if len(urgent_items) > 0:
+        st.markdown(f"""
+        <div style="background: linear-gradient(90deg, #ff4b4b, #ff9900); padding: 14px 20px; border-radius: 10px; color: white; font-weight: bold; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(255,75,75,0.4);">
+            🚨 STARK SECURITY ALERT: {len(urgent_items)} Critical Deadlines Require Immediate Boss Attention! Check Priority Matrix below.
+        </div>
+        """, unsafe_allow_html=True)
+
+# Sidebar for System Diagnostics & Autonomous Notification Hub
 with st.sidebar:
     st.image("https://img.icons8.com/fluency/96/iron-man.png", width=80)
     st.markdown("### JARVIS Command Hub")
@@ -30,40 +43,15 @@ with st.sidebar:
     st.markdown(f"**Student Tasks:** {len(st.session_state.student_tasks)}")
     st.markdown("---")
     
-    st.markdown("### 🎙️ Stark Neural Voice Simulator")
-    st.markdown("Simulate voice commands for live hackathon demonstration:")
-    
-    voice_cmd = st.selectbox(
-        "Select Voice Protocol:",
-        [
-            "-- Select Command --",
-            "🗣️ 'JARVIS, run full system diagnostics'",
-            "🗣️ 'JARVIS, what is my most urgent deadline?'",
-            "🗣️ 'JARVIS, execute security lockdown scan'",
-            "🗣️ 'JARVIS, give me a morning briefing'"
-        ]
-    )
-    
-    if st.button("🔊 Execute Voice Command"):
-        if voice_cmd != "-- Select Command --":
-            all_records = st.session_state.vault + st.session_state.student_tasks
-            if "diagnostics" in voice_cmd:
-                resp = f"Diagnostics Report: Core temp optimal. Vault records: {len(st.session_state.vault)}. Student tasks: {len(st.session_state.student_tasks)}. All security protocols green."
-            elif "urgent" in voice_cmd:
-                if len(all_records) > 0:
-                    top_item = max(all_records, key=lambda x: x.get('urgency_score', 0))
-                    name_key = top_item.get('name', top_item.get('title'))
-                    resp = f"Sir, most urgent item is **{name_key}** due on **{top_item['deadline']}**."
-                else:
-                    resp = "Sir, no active records or deadlines found in the database."
-            elif "lockdown" in voice_cmd:
-                resp = "Security lockdown initiated. Digilocker-class encryption active. Zero vulnerabilities detected."
-            else:
-                resp = "All systems are running at peak efficiency, Boss. Ready for KRYPTA 2026 presentation."
-            
-            st.session_state.messages.append({"role": "user", "content": voice_cmd})
-            st.session_state.messages.append({"role": "assistant", "content": resp})
-            st.rerun()
+    st.markdown("### 🔔 Autonomous Notification Stream")
+    if len(all_active_records) > 0:
+        # Sort and show top 3 notifications
+        notif_sorted = sorted(all_active_records, key=lambda x: x['urgency_score'], reverse=True)[:3]
+        for n_item in notif_sorted:
+            n_name = n_item.get('name', n_item.get('title'))
+            st.warning(f"⚠️ **{n_name}**\nDue: {n_item['deadline']}")
+    else:
+        st.success("All systems clear. No pending threat alerts.")
 
     st.markdown("---")
     st.markdown("### 💬 JARVIS AI Intelligence")
@@ -73,7 +61,18 @@ with st.sidebar:
                 
     if user_query := st.chat_input("Ask JARVIS anything..."):
         st.session_state.messages.append({"role": "user", "content": user_query})
-        bot_reply = f"I processed your query: '{user_query}'. All security parameters are stable."
+        q_lower = user_query.lower()
+        
+        if "urgent" in q_lower or "deadline" in q_lower or "notify" in q_lower:
+            if len(all_active_records) > 0:
+                top_item = max(all_active_records, key=lambda x: x.get('urgency_score', 0))
+                name_key = top_item.get('name', top_item.get('title'))
+                bot_reply = f"Boss, your most urgent notification is for **{name_key}** due on **{top_item['deadline']}**."
+            else:
+                bot_reply = "Boss, no active notifications or deadlines registered in the system."
+        else:
+            bot_reply = f"I processed your query: '{user_query}'. All notification radars are actively scanning your schedules."
+            
         st.session_state.messages.append({"role": "assistant", "content": bot_reply})
         st.rerun()
 
@@ -88,7 +87,7 @@ tab1, tab2 = st.tabs(["📁 Enterprise / General Vault", "🎓 Student Homework 
 
 with tab1:
     st.subheader("📥 Secure Document & File Ingestion Portal")
-    st.markdown("Upload PDFs, text files, or document snapshots for instant priority sorting.")
+    st.markdown("Upload PDFs or documents to trigger autonomous deadline tracking and real-time notifications.")
     
     with st.form("vault_form", clear_on_submit=True):
         uploaded_file = st.file_uploader("Upload PDF, Text Document, or Image", type=["pdf", "txt", "png", "jpg", "jpeg"])
@@ -102,7 +101,7 @@ with tab1:
         with col_f3:
             ampm_choice = st.selectbox("AM / PM", ["AM", "PM"])
             
-        submit_vault = st.form_submit_button("🚀 Ingest & Prioritize Asset")
+        submit_vault = st.form_submit_button("🚀 Ingest & Activate Notifications")
         
         if submit_vault and uploaded_file is not None:
             try:
@@ -146,10 +145,10 @@ with tab1:
                 "upload_time": current_dt.strftime("%Y-%m-%d %I:%M %p")
             }
             st.session_state.vault.append(doc_record)
-            st.success(f"Successfully ingested '{uploaded_file.name}' into Enterprise Vault!")
+            st.success(f"Successfully ingested '{uploaded_file.name}' and scheduled active notifications!")
 
     st.markdown("---")
-    st.subheader("📋 Prioritized Vault Archive (Sorted by Urgency)")
+    st.subheader("📋 Prioritized Vault Archive & Notification Matrix")
 
     if len(st.session_state.vault) > 0:
         sorted_vault = sorted(st.session_state.vault, key=lambda x: x['urgency_score'], reverse=True)
@@ -164,7 +163,7 @@ with tab1:
             </div>
             """, unsafe_allow_html=True)
             
-            with st.expander(f"🔍 View File & Controls for {doc['name']}"):
+            with st.expander(f"🔍 View File & Notification Controls for {doc['name']}"):
                 if "image" in doc['type']:
                     st.image(doc['content'], caption=doc['name'], use_column_width=True)
                 else:
@@ -173,11 +172,11 @@ with tab1:
                     st.session_state.vault.remove(doc)
                     st.rerun()
     else:
-        st.info("Vault is empty. Upload documents above to begin sorting.")
+        st.info("Vault is empty. Upload documents above to initialize notification streams.")
 
 with tab2:
     st.subheader("🎓 Student Homework, Project & Exam Hub")
-    st.markdown("Designed for students to instantly log college assignments, exams, or registrations and receive autonomous priority alerts.")
+    st.markdown("Log exams or assignments to receive real-time Stark notifications and priority alerts.")
 
     with st.form("student_task_form", clear_on_submit=True):
         t_title = st.text_input("Task / Exam / Assignment Title (e.g., C Programming Practical)")
@@ -191,7 +190,7 @@ with tab2:
         with tc3:
             t_ampm = st.selectbox("AM / PM", ["AM", "PM"], key="st_ampm")
             
-        submit_task = st.form_submit_button("🚀 Log Student Task")
+        submit_task = st.form_submit_button("🚀 Log Task & Enable Reminders")
         
         if submit_task and t_title:
             t_base_fmt = t_time.strftime("%I:%M")
@@ -218,10 +217,10 @@ with tab2:
                 "created": cur_dt.strftime("%Y-%m-%d %I:%M %p")
             }
             st.session_state.student_tasks.append(task_record)
-            st.success("Student task successfully logged into the priority matrix!")
+            st.success("Student task logged! Autonomous notification stream updated.")
 
     st.markdown("---")
-    st.subheader("📋 Prioritized Student Task Stream")
+    st.subheader("📋 Prioritized Student Task & Notification Stream")
 
     if len(st.session_state.student_tasks) > 0:
         sorted_tasks = sorted(st.session_state.student_tasks, key=lambda x: x['urgency_score'], reverse=True)
@@ -241,4 +240,4 @@ with tab2:
                 st.session_state.student_tasks.remove(task)
                 st.rerun()
     else:
-        st.info("No active student reminders logged yet.")
+        st.info("No active student reminders or notifications logged yet.")
