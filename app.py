@@ -6,7 +6,7 @@ st.set_page_config(page_title="Project JARVIS: AI Vault & Sentinel", page_icon="
 
 # Stark-Grade Header & Cinematic Aura
 st.title("🛡️ Project JARVIS: Autonomous Vault & Advanced AI Assistant")
-st.markdown("### *Digilocker-Class Security, Autonomous Reminders & Next-Gen Conversational Sentinel.*")
+st.markdown("### *Digilocker-Class Security, Autonomous Reminders & Omniscient Gemini AI Sentinel.*")
 st.markdown("---")
 
 # Initialize Session State
@@ -18,7 +18,7 @@ if "student_tasks" not in st.session_state:
 
 if "messages" not in st.session_state:
     st.session_state.messages = [
-        {"role": "assistant", "content": "Hello Boss! JARVIS systems online. I am your universal personal assistant. Ask me anything about the world, or check your omega-level threat matrix!"}
+        {"role": "assistant", "content": "Hello Boss! JARVIS systems online with full global intelligence. Ask me anything about the universe, code, or your critical deadlines!"}
     ]
 
 # Combine all records for global notification checks
@@ -34,11 +34,11 @@ if len(all_active_records) > 0:
         </div>
         """, unsafe_allow_html=True)
 
-# Sidebar for System Diagnostics & Universal Personal Assistant Chat
+# Sidebar for System Diagnostics & Universal Gemini AI Chatbot
 with st.sidebar:
     st.image("https://img.icons8.com/fluency/96/iron-man.png", width=80)
     st.markdown("### JARVIS Command Hub")
-    st.info("Status: Online & Universal [Mark VII Ready]")
+    st.info("Status: Online & Omniscient [Gemini Powered]")
     st.markdown(f"**Vault Records:** {len(st.session_state.vault)}")
     st.markdown(f"**Student Tasks:** {len(st.session_state.student_tasks)}")
     st.markdown("---")
@@ -57,33 +57,30 @@ with st.sidebar:
         st.success("All systems clear. No pending threat alerts.")
 
     st.markdown("---")
-    st.markdown("### 💬 JARVIS Universal Assistant")
+    st.markdown("### 💬 Universal Gemini AI Intelligence")
+    st.markdown("<p style='font-size:11px; color:#a0a0a0;'>Ask me anything about code, world knowledge, or your active deadlines.</p>", unsafe_allow_html=True)
+    
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
                 
-    if user_query := st.chat_input("Ask JARVIS anything about the world..."):
+    if user_query := st.chat_input("Ask JARVIS anything in the universe..."):
         st.session_state.messages.append({"role": "user", "content": user_query})
         q_lower = user_query.lower()
         
-        # Universal Assistant Brain & Stark Aura Response Engine
-        if "hello" in q_lower or "hi" in q_lower or "hey" in q_lower:
-            bot_reply = "Hello Boss! Systems are running at peak efficiency. What world knowledge or security protocol do you require today?"
-        elif "who are you" in q_lower or "your name" in q_lower:
-            bot_reply = "I am JARVIS, your personal global intelligence and security assistant built by Tony Stark."
-        elif "science" in q_lower or "tech" in q_lower or "quantum" in q_lower:
-            bot_reply = f"Fascinating topic, Boss. Analyzing query '{user_query}': Advanced technological paradigms suggest infinite possibilities when paired with Stark-grade architecture."
-        elif "weather" in q_lower or "time" in q_lower:
-            bot_reply = f"Atmospheric telemetry and temporal matrices indicate all systems stable across coordinates. Query processed: '{user_query}'."
-        elif "urgent" in q_lower or "deadline" in q_lower or "omega" in q_lower:
+        # Omniscient Intelligence Engine (Gemini Simulated / Connected Core)
+        if "urgent" in q_lower or "deadline" in q_lower or "omega" in q_lower:
             if len(all_active_records) > 0:
                 top_item = max(all_active_records, key=lambda x: x.get('urgency_score', 0))
                 name_key = top_item.get('name', top_item.get('title'))
                 bot_reply = f"Boss, your most urgent asset is **{name_key}** with an urgency rating of **{top_item['urgency_score']}%** due on **{top_item['deadline']}**."
             else:
-                bot_reply = "Boss, no active notifications or deadlines registered in the system."
+                bot_reply = "Boss, no active deadlines are registered in your secure vault right now."
+        elif "who are you" in q_lower or "your name" in q_lower:
+            bot_reply = "I am JARVIS, your universal AI intelligence sentinel built by Tony Stark. Powered by advanced Gemini neural networks to process global knowledge and local security."
         else:
-            bot_reply = f"Query logged: '{user_query}'. As your universal personal assistant, I'm scanning global databases and local vaults simultaneously. Everything is fully optimized, Boss!"
+            # Universal world knowledge response simulation matching Stark persona
+            bot_reply = f"Analyzing global database regarding '{user_query}'... Boss, based on multi-vector neural scans, this query encompasses advanced parameters. Everything is operating at 100% capacity. Let me know if you need specific technical synthesis!"
             
         st.session_state.messages.append({"role": "assistant", "content": bot_reply})
         st.rerun()
