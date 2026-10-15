@@ -96,7 +96,7 @@ with tab1:
         with col_f1:
             dl_date = st.date_input("Deadline Date")
         with col_f2:
-            dl_time = st.time_input("Deadline Time (12-Hour)", value=datetime.strptime("12:00 PM", "%I:%M %p").time())
+            dl_time = st.time_input("Deadline Time", value=datetime.strptime("12:00 PM", "%I:%M %p").time())
         with col_f3:
             ampm_choice = st.selectbox("AM / PM", ["AM", "PM"])
             
