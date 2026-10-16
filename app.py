@@ -2,14 +2,17 @@ import streamlit as st
 from datetime import datetime
 
 # Page Configuration
-st.set_page_config(page_title="Project JARVIS: AI Vault & Sentinel", page_icon="🛡️", layout="wide")
+st.set_page_config(page_title="Project JARVIS: Stark Enterprise Vault", page_icon="🛡️", layout="wide")
 
 # Initialize Authentication & Session State
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if "registered_users" not in st.session_state:
-    st.session_state.registered_users = {}  # Format: {email: {"password": pwd, "pattern": pat}}
+    # Pre-loaded default Stark credential for instant hackathon demo access!
+    st.session_state.registered_users = {
+        "boss@stark.com": {"password": "jarvis3000", "pattern": "3000"}
+    }
 
 if "current_user" not in st.session_state:
     st.session_state.current_user = None
@@ -22,35 +25,41 @@ if "student_tasks" not in st.session_state:
 
 if "messages" not in st.session_state:
     st.session_state.messages = [
-        {"role": "assistant", "content": "Hello Boss! JARVIS security gateway active. Authenticate via secure credentials and pattern lock to access vault."}
+        {"role": "assistant", "content": "Hello Boss! JARVIS defense grid active. Authenticated under Tony Stark protocols."}
     ]
 
-# --- INSTAGRAM-STYLE SECURE AUTH GATEWAY ---
+# --- TONY STARK BRANDED SECURE AUTH GATEWAY ---
 if not st.session_state.authenticated:
-    st.markdown("<h1 style='text-align: center;'>🛡️ Project JARVIS: Secure Enterprise Gate</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #a0a0a0;'>Digilocker-Class Privacy Portal | Designed for KRYPTA 2026</p>", unsafe_allow_html=True)
+    col_logo1, col_logo2, col_logo3 = st.columns([1, 1, 1])
+    with col_logo2:
+        st.image("https://img.icons8.com/fluency/96/iron-man.png", width=100)
+    
+    st.markdown("<h1 style='text-align: center; color: #ff4b4b;'>STARK INDUSTRIES : PROJECT JARVIS</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #00ffcc; font-size: 16px;'><b>Creator & Architect: Tony Stark</b> | Digilocker-Class Enterprise Privacy Gate</p>", unsafe_allow_html=True)
     st.markdown("---")
 
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        auth_mode = st.radio("Select Access Mode:", ["🔑 Login Existing Account", "✨ Create New Account"], horizontal=True)
+    col_a1, col_a2, col_a3 = st.columns([1, 2, 1])
+    with col_a2:
+        st.info("💡 **Hackathon Demo Hint:** You can login instantly using Demo Credentials -> Email: `boss@stark.com` | Password: `jarvis3000` | Passcode: `3000`")
         
-        with st.form("auth_form"):
-            email_input = st.text_input("📧 Stark Enterprise Email / ID")
-            pwd_input = st.text_input("🔒 Secure Password", type="password")
+        auth_mode = st.radio("Select Access Protocol:", ["🔑 Login Existing Account", "✨ Create New Stark ID"], horizontal=True)
+        
+        with st.form("stark_auth_form"):
+            email_input = st.text_input("📧 Stark Enterprise Email / ID", value="boss@stark.com")
+            pwd_input = st.text_input("🔒 Secure Password", type="password", value="jarvis3000")
             
-            st.markdown("#### 📱 Mobile-Style Security Pattern / Passcode")
-            pattern_input = st.text_input("Enter 4-Digit Security Passcode (e.g., 3000)", type="password", max_chars=4)
+            st.markdown("#### 📱 Mobile-Style Security Passcode / Pattern")
+            pattern_input = st.text_input("Enter 4-Digit Security Passcode (e.g., 3000)", type="password", max_chars=4, value="3000")
             
-            btn_label = "🔓 Authenticate & Access Vault" if auth_mode == "🔑 Login Existing Account" else "🚀 Initialize New Account"
+            btn_label = "🔓 Bypass Security & Access Vault" if auth_mode == "🔑 Login Existing Account" else "🚀 Initialize New Stark Account"
             submitted = st.form_submit_button(btn_label, use_container_width=True)
             
             if submitted:
                 if not email_input or not pwd_input or not pattern_input:
-                    st.error("Boss, all security fields (Email, Password, & Passcode) are required!")
-                elif auth_mode == "✨ Create New Account":
+                    st.error("Boss, all security vectors (Email, Password, & Passcode) are mandatory!")
+                elif auth_mode == "✨ Create New Stark ID":
                     if email_input in st.session_state.registered_users:
-                        st.warning("Account already exists! Please switch to 'Login Existing Account'.")
+                        st.warning("Account already exists in Stark Database! Please switch to 'Login Existing Account'.")
                     else:
                         st.session_state.registered_users[email_input] = {
                             "password": pwd_input,
@@ -58,7 +67,7 @@ if not st.session_state.authenticated:
                         }
                         st.session_state.authenticated = True
                         st.session_state.current_user = email_input
-                        st.success("Account created successfully! Initializing JARVIS systems...")
+                        st.success("New Stark ID generated successfully! Initializing Mark VII Matrix...")
                         st.rerun()
                 else:  # Login Mode
                     if email_input in st.session_state.registered_users:
@@ -66,19 +75,19 @@ if not st.session_state.authenticated:
                         if user_data["password"] == pwd_input and user_data["pattern"] == pattern_input:
                             st.session_state.authenticated = True
                             st.session_state.current_user = email_input
-                            st.success(f"Welcome back, Boss ({email_input})! Access granted.")
+                            st.success(f"Authentication Verified. Welcome back, Boss ({email_input}).")
                             st.rerun()
                         else:
-                            st.error("Authentication Failed: Incorrect Password or Security Passcode!")
+                            st.error("Security Breach Alert: Incorrect Password or 4-Digit Passcode!")
                     else:
-                        st.error("Account not found! Please create a new account first.")
-    st.stop()  # Stop execution here until authenticated
+                        st.error("Stark ID not recognized in database! Please create a new account.")
+    st.stop()
 
-# --- MAIN APP (Runs only after successful login) ---
+# --- MAIN APP (Runs only after secure authentication) ---
 
 # Stark-Grade Header & Cinematic Aura
 st.title("🛡️ Project JARVIS: Autonomous Vault & Advanced AI Assistant")
-st.markdown(f"### *Authenticated User: **{st.session_state.current_user}** | Digilocker Security Active*")
+st.markdown(f"### *Architect: Tony Stark | Authenticated User: **{st.session_state.current_user}** | Privacy Protocol Active*")
 st.markdown("---")
 
 all_active_records = st.session_state.vault + st.session_state.student_tasks
@@ -96,17 +105,17 @@ if len(all_active_records) > 0:
 # Sidebar for System Diagnostics & File-Aware AI Query Bot
 with st.sidebar:
     st.image("https://img.icons8.com/fluency/96/iron-man.png", width=80)
-    st.markdown("### JARVIS Command Hub")
+    st.markdown("### Stark Command Hub")
     st.info(f"User: {st.session_state.current_user}")
     st.markdown(f"**Vault Records:** {len(st.session_state.vault)}")
     st.markdown(f"**Student Tasks:** {len(st.session_state.student_tasks)}")
     st.markdown("---")
     
-    # Logout System Button
-    if st.button("🚪 Logout Secure Session", use_container_width=True):
+    # Secure Logout Button
+    if st.button("🚪 Secure Session Logout", use_container_width=True):
         st.session_state.authenticated = False
         st.session_state.current_user = None
-        st.success("Session terminated securely.")
+        st.success("Session locked securely under Stark protocols.")
         st.rerun()
 
     st.markdown("---")
@@ -127,7 +136,7 @@ with st.sidebar:
         ]
         
         if len(matched_items) > 0:
-            bot_reply = f"Boss, found {len(matched_items)} matching record(s) in the database:\n"
+            bot_reply = f"Boss, found {len(matched_items)} matching record(s) in the Stark database:\n"
             for m in matched_items:
                 m_name = m.get('name', m.get('title'))
                 bot_reply += f"\n- **{m_name}** | Deadline: *{m['deadline']}* | Urgency: **{m['urgency_score']}% ({m['urgency_label']})**"
