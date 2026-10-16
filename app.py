@@ -19,7 +19,7 @@ if "messages" not in st.session_state:
         {"role": "assistant", "content": "Hello Boss! JARVIS defense grid active. Authenticated under Tony Stark protocols."}
     ]
 
-# --- TONY STARK SECURE GATEWAY (BULLETPROOF & FAST) ---
+# --- TONY STARK SECURE GATEWAY ---
 if not st.session_state.authenticated:
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
@@ -45,7 +45,7 @@ if not st.session_state.authenticated:
                     st.error("Access Denied: Incorrect Stark credentials!")
         st.stop()
 
-# --- MAIN APP (After Successful Authorization) ---
+# --- MAIN APP ---
 
 st.title("🛡️ Project JARVIS: Autonomous Vault & Advanced AI Assistant")
 st.markdown("### *Architect: Tony Stark | Digilocker-Class Security Active*")
@@ -113,7 +113,7 @@ with tab1:
         with col_f1:
             dl_date = st.date_input("Deadline Date")
         with col_f2:
-            dl_time = st.time_input("Deadline Time (12-Hour)", value=datetime.strptime("12:00 PM", "%I:%M %p").time())
+            dl_time = st.time_input("Deadline Time", value=datetime.strptime("12:00 PM", "%I:%M %p").time())
         with col_f3:
             ampm_choice = st.selectbox("AM / PM", ["AM", "PM"])
             
