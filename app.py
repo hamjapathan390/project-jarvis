@@ -9,9 +9,9 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if "registered_users" not in st.session_state:
-    # Pre-loaded default Stark credential for instant hackathon demo access!
+    # Default demo user with pattern sequence '1236'
     st.session_state.registered_users = {
-        "boss@stark.com": {"password": "jarvis3000", "pattern": "3000"}
+        "boss@stark.com": {"password": "jarvis3000", "pattern": "1-2-3-6"}
     }
 
 if "current_user" not in st.session_state:
@@ -40,7 +40,7 @@ if not st.session_state.authenticated:
 
     col_a1, col_a2, col_a3 = st.columns([1, 2, 1])
     with col_a2:
-        st.info("💡 **Hackathon Demo Hint:** You can login instantly using Demo Credentials -> Email: `boss@stark.com` | Password: `jarvis3000` | Passcode: `3000`")
+        st.info("💡 **Hackathon Demo Hint:** Demo Email: `boss@stark.com` | Password: `jarvis3000` | Pattern Sequence: `1-2-3-6`")
         
         auth_mode = st.radio("Select Access Protocol:", ["🔑 Login Existing Account", "✨ Create New Stark ID"], horizontal=True)
         
@@ -48,22 +48,51 @@ if not st.session_state.authenticated:
             email_input = st.text_input("📧 Stark Enterprise Email / ID", value="boss@stark.com")
             pwd_input = st.text_input("🔒 Secure Password", type="password", value="jarvis3000")
             
-            st.markdown("#### 📱 Mobile-Style Security Passcode / Pattern")
-            pattern_input = st.text_input("Enter 4-Digit Security Passcode (e.g., 3000)", type="password", max_chars=4, value="3000")
+            st.markdown("#### 🔐 Android-Style 3x3 Grid Security Pattern")
+            st.markdown("<p style='font-size: 12px; color: #a0a0a0;'>Select your dot sequence order (e.g., 1-2-3-6 or 7-8-9):</p>", unsafe_allow_html=True)
+            
+            # Interactive 3x3 Grid Checkboxes for Pattern Lock
+            st.markdown("**Grid Matrix:**")
+            g_col1, g_col2, g_col3 = st.columns(3)
+            with g_col1:
+                dot_1 = st.checkbox("⚫ Dot 1", value=True)
+                dot_4 = st.checkbox("⚫ Dot 4")
+                dot_7 = st.checkbox("⚫ Dot 7")
+            with g_col2:
+                dot_2 = st.checkbox("⚫ Dot 2", value=True)
+                dot_5 = st.checkbox("⚫ Dot 5")
+                dot_8 = st.checkbox("⚫ Dot 8")
+            with g_col3:
+                dot_3 = st.checkbox("⚫ Dot 3", value=True)
+                dot_6 = st.checkbox("⚫ Dot 6", value=True)
+                dot_9 = st.checkbox("⚫ Dot 9")
             
             btn_label = "🔓 Bypass Security & Access Vault" if auth_mode == "🔑 Login Existing Account" else "🚀 Initialize New Stark Account"
             submitted = st.form_submit_button(btn_label, use_container_width=True)
             
             if submitted:
-                if not email_input or not pwd_input or not pattern_input:
-                    st.error("Boss, all security vectors (Email, Password, & Passcode) are mandatory!")
+                # Compile pattern string from checked dots
+                active_dots = []
+                if dot_1: active_dots.append("1")
+                if dot_2: active_dots.append("2")
+                if dot_3: active_dots.append("3")
+                if dot_4: active_dots.append("4")
+                if dot_5: active_dots.append("5")
+                if dot_6: active_dots.append("6")
+                if dot_7: active_dots.append("7")
+                if dot_8: active_dots.append("8")
+                if dot_9: active_dots.append("9")
+                pattern_sequence = "-".join(active_dots)
+                
+                if not email_input or not pwd_input or not pattern_sequence:
+                    st.error("Boss, all security vectors (Email, Password, & Pattern Sequence) are mandatory!")
                 elif auth_mode == "✨ Create New Stark ID":
                     if email_input in st.session_state.registered_users:
                         st.warning("Account already exists in Stark Database! Please switch to 'Login Existing Account'.")
                     else:
                         st.session_state.registered_users[email_input] = {
                             "password": pwd_input,
-                            "pattern": pattern_input
+                            "pattern": pattern_sequence
                         }
                         st.session_state.authenticated = True
                         st.session_state.current_user = email_input
@@ -72,13 +101,13 @@ if not st.session_state.authenticated:
                 else:  # Login Mode
                     if email_input in st.session_state.registered_users:
                         user_data = st.session_state.registered_users[email_input]
-                        if user_data["password"] == pwd_input and user_data["pattern"] == pattern_input:
+                        if user_data["password"] == pwd_input and user_data["pattern"] == pattern_sequence:
                             st.session_state.authenticated = True
                             st.session_state.current_user = email_input
                             st.success(f"Authentication Verified. Welcome back, Boss ({email_input}).")
                             st.rerun()
                         else:
-                            st.error("Security Breach Alert: Incorrect Password or 4-Digit Passcode!")
+                            st.error("Security Breach Alert: Incorrect Password or Grid Pattern Sequence!")
                     else:
                         st.error("Stark ID not recognized in database! Please create a new account.")
     st.stop()
