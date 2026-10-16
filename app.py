@@ -4,12 +4,16 @@ from datetime import datetime
 # Page Configuration
 st.set_page_config(page_title="Project JARVIS: AI Vault & Sentinel", page_icon="🛡️", layout="wide")
 
-# Stark-Grade Header & Cinematic Aura
-st.title("🛡️ Project JARVIS: Autonomous Vault & Advanced AI Assistant")
-st.markdown("### *Digilocker-Class Security, Autonomous Reminders & Next-Gen Conversational Sentinel.*")
-st.markdown("---")
+# Initialize Authentication & Session State
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
 
-# Initialize Session State
+if "registered_users" not in st.session_state:
+    st.session_state.registered_users = {}  # Format: {email: {"password": pwd, "pattern": pat}}
+
+if "current_user" not in st.session_state:
+    st.session_state.current_user = None
+
 if "vault" not in st.session_state:
     st.session_state.vault = []
 
@@ -18,10 +22,65 @@ if "student_tasks" not in st.session_state:
 
 if "messages" not in st.session_state:
     st.session_state.messages = [
-        {"role": "assistant", "content": "Hello Boss! JARVIS systems online. Ask me about any uploaded file name or task to retrieve its tactical status instantly."}
+        {"role": "assistant", "content": "Hello Boss! JARVIS security gateway active. Authenticate via secure credentials and pattern lock to access vault."}
     ]
 
-# Combine all records for global checks
+# --- INSTAGRAM-STYLE SECURE AUTH GATEWAY ---
+if not st.session_state.authenticated:
+    st.markdown("<h1 style='text-align: center;'>🛡️ Project JARVIS: Secure Enterprise Gate</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #a0a0a0;'>Digilocker-Class Privacy Portal | Designed for KRYPTA 2026</p>", unsafe_allow_html=True)
+    st.markdown("---")
+
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        auth_mode = st.radio("Select Access Mode:", ["🔑 Login Existing Account", "✨ Create New Account"], horizontal=True)
+        
+        with st.form("auth_form"):
+            email_input = st.text_input("📧 Stark Enterprise Email / ID")
+            pwd_input = st.text_input("🔒 Secure Password", type="password")
+            
+            st.markdown("#### 📱 Mobile-Style Security Pattern / Passcode")
+            pattern_input = st.text_input("Enter 4-Digit Security Passcode (e.g., 3000)", type="password", max_chars=4)
+            
+            btn_label = "🔓 Authenticate & Access Vault" if auth_mode == "🔑 Login Existing Account" else "🚀 Initialize New Account"
+            submitted = st.form_submit_button(btn_label, use_container_width=True)
+            
+            if submitted:
+                if not email_input or not pwd_input or not pattern_input:
+                    st.error("Boss, all security fields (Email, Password, & Passcode) are required!")
+                elif auth_mode == "✨ Create New Account":
+                    if email_input in st.session_state.registered_users:
+                        st.warning("Account already exists! Please switch to 'Login Existing Account'.")
+                    else:
+                        st.session_state.registered_users[email_input] = {
+                            "password": pwd_input,
+                            "pattern": pattern_input
+                        }
+                        st.session_state.authenticated = True
+                        st.session_state.current_user = email_input
+                        st.success("Account created successfully! Initializing JARVIS systems...")
+                        st.rerun()
+                else:  # Login Mode
+                    if email_input in st.session_state.registered_users:
+                        user_data = st.session_state.registered_users[email_input]
+                        if user_data["password"] == pwd_input and user_data["pattern"] == pattern_input:
+                            st.session_state.authenticated = True
+                            st.session_state.current_user = email_input
+                            st.success(f"Welcome back, Boss ({email_input})! Access granted.")
+                            st.rerun()
+                        else:
+                            st.error("Authentication Failed: Incorrect Password or Security Passcode!")
+                    else:
+                        st.error("Account not found! Please create a new account first.")
+    st.stop()  # Stop execution here until authenticated
+
+# --- MAIN APP (Runs only after successful login) ---
+
+# Stark-Grade Header & Cinematic Aura
+st.title("🛡️ Project JARVIS: Autonomous Vault & Advanced AI Assistant")
+st.markdown(f"### *Authenticated User: **{st.session_state.current_user}** | Digilocker Security Active*")
+st.markdown("---")
+
 all_active_records = st.session_state.vault + st.session_state.student_tasks
 
 # --- TONY STARK AURA: OMEGA 90%+ CRITICAL ALERT BANNER ---
@@ -38,11 +97,19 @@ if len(all_active_records) > 0:
 with st.sidebar:
     st.image("https://img.icons8.com/fluency/96/iron-man.png", width=80)
     st.markdown("### JARVIS Command Hub")
-    st.info("Status: Online & Autonomous [Mark VII Ready]")
+    st.info(f"User: {st.session_state.current_user}")
     st.markdown(f"**Vault Records:** {len(st.session_state.vault)}")
     st.markdown(f"**Student Tasks:** {len(st.session_state.student_tasks)}")
     st.markdown("---")
     
+    # Logout System Button
+    if st.button("🚪 Logout Secure Session", use_container_width=True):
+        st.session_state.authenticated = False
+        st.session_state.current_user = None
+        st.success("Session terminated securely.")
+        st.rerun()
+
+    st.markdown("---")
     st.markdown("### 🤖 Stark File Intelligence Bot")
     st.markdown("Type any uploaded file name or task keyword below to find its live status:")
     
@@ -54,7 +121,6 @@ with st.sidebar:
         st.session_state.messages.append({"role": "user", "content": user_query})
         q_lower = user_query.lower()
         
-        # File-Aware Query Matching Engine
         matched_items = [
             item for item in all_active_records 
             if q_lower in item.get('name', '').lower() or q_lower in item.get('title', '').lower() or q_lower in item.get('desc', '').lower()
