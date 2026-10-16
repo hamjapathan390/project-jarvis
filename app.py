@@ -48,7 +48,7 @@ if not st.session_state.authenticated:
 # --- MAIN APP ---
 
 st.title("🛡️ Project JARVIS: Autonomous Vault & Advanced AI Assistant")
-st.markdown("### *Architect: Tony Stark | Digilocker-Class Security Active*")
+st.markdown("### *Architect: Tony Stark | Arc Reactor Core: 100% Stable | Digilocker Security Active*")
 st.markdown("---")
 
 all_active_records = st.session_state.vault + st.session_state.student_tasks
@@ -67,6 +67,7 @@ if len(all_active_records) > 0:
 with st.sidebar:
     st.image("https://img.icons8.com/fluency/96/iron-man.png", width=80)
     st.markdown("### Stark Command Hub")
+    st.markdown("🔋 **Arc Reactor:** Online (3000 GW)")
     st.markdown(f"**Vault Records:** {len(st.session_state.vault)}")
     st.markdown(f"**Student Tasks:** {len(st.session_state.student_tasks)}")
     st.markdown("---")
